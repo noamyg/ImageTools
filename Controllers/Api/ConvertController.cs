@@ -16,6 +16,8 @@ namespace ImageTools.Controllers.Api
     {
         
         [HttpPost]
+        [Route("api/convert/pdfToPng")]
+        [Route("api/convert/pdfToJpg")]
         public async Task<HttpResponseMessage> PdfToPng()
         {
             HttpResponseMessage response;
@@ -26,59 +28,35 @@ namespace ImageTools.Controllers.Api
                 response.Content = new StringContent("Base 64 input cannot be empty");
             }
             else try
-                {
-                    response = new HttpResponseMessage(HttpStatusCode.OK);
-                    response.Content = new StringContent(string.Format("data:image/{0};base64,{1}", "png", Base64PdfToImage(MagickFormat.Png, base64FromRequest)));
-
-                }
-                catch (Exception e)
-                {
-                    if (e is MagickMissingDelegateErrorException || e is FormatException)
-                    {
-                        response = new HttpResponseMessage(HttpStatusCode.BadRequest);
-                        response.Content = new StringContent("Not a valid PDF Base64 input");
-                    }
-                    else
-                    {
-                        response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
-                        response.Content = new StringContent("Server was unable to parse the input");
-                    }
-                }
-            return response;
-        }
-
-
-        [HttpPost]
-        public async Task<HttpResponseMessage> PdfToJpg()
-        {
-            HttpResponseMessage response;
-            var base64FromRequest = await Request.Content.ReadAsStringAsync();
-            if (base64FromRequest == null || base64FromRequest.Length == 0)
             {
-                response = new HttpResponseMessage(HttpStatusCode.BadRequest);
-                response.Content = new StringContent("Base 64 input cannot be empty");
-            }
-            else try
+                response = new HttpResponseMessage(HttpStatusCode.OK);
+                var route = Request.RequestUri.Segments.Last();
+                if (route == "pdfToPng")
                 {
-                    response = new HttpResponseMessage(HttpStatusCode.OK);
+                    response.Content = new StringContent(string.Format("data:image/{0};base64,{1}", "png", Base64PdfToImage(MagickFormat.Png, base64FromRequest)));
+                }
+                else if (route == "pdfToJpg")
+                {
                     response.Content = new StringContent(string.Format("data:image/{0};base64,{1}", "jpeg", Base64PdfToImage(MagickFormat.Jpg, base64FromRequest)));
+                }
 
-                }
-                catch (Exception e)
+            }
+            catch (Exception e)
+            {
+                if (e is MagickMissingDelegateErrorException || e is FormatException)
                 {
-                    if (e is MagickMissingDelegateErrorException || e is FormatException)
-                    {
-                        response = new HttpResponseMessage(HttpStatusCode.BadRequest);
-                        response.Content = new StringContent("Not a valid PDF Base64 input");
-                    }
-                    else
-                    {
-                        response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
-                        response.Content = new StringContent("Server was unable to parse the input");
-                    }
+                    response = new HttpResponseMessage(HttpStatusCode.BadRequest);
+                    response.Content = new StringContent("Not a valid PDF Base64 input");
                 }
+                else
+                {
+                    response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                    response.Content = new StringContent("Server was unable to parse the input");
+                }
+            }
             return response;
         }
+        
 
         private string Base64PdfToImage(MagickFormat format, string base64FromRequest)
         {
