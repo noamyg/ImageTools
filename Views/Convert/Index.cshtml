@@ -1,0 +1,50 @@
+﻿@{
+    ViewBag.Title = "Convert Functions";
+}
+
+<div class="jumbotron">
+    <h1>Convert from PDF</h1>
+    <form id="convertPdf">
+        <div class="form-group">
+            <label for="base64Pdf">PDF Base64</label>
+            <textarea class="form-control" id="base64Pdf" rows="5"></textarea>
+        </div>
+        <button id="toJpgSubmitButton" onclick="return convertPdfToImage('pdfToJpg')" type="submit" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="" data-original-title="Non-transparent format - will translate background to white">Convert To JPG</button>
+        <button id="toPngSubmitButton" onclick="return convertPdfToImage('pdfToPng')" type="submit" class="btn btn-secondary">Convert To PNG</button>
+    </form>
+</div>
+
+<div style="display: none;" class="container bg-white">
+    <img id="imageResponse" class="img-fluid" alt="Responsive image"/>
+</div>
+
+
+@section scripts
+{
+    <script>
+        $(document).ready(function(){
+            $('[data-toggle="tooltip"]').tooltip();
+            
+        });
+        
+        function convertPdfToImage(service) {
+            toastr.info('Submitting...');
+            $.ajax({
+                url: "/api/convert/" + service,
+                method: "post",
+                contentType: "application/pdf",
+                data: $('#base64Pdf').val()
+            })
+           .done(function (data) {
+               toastr.success("Image loaded");
+               $('#imageResponse').parent('div').show();
+               $('#imageResponse').attr('src', data);
+            })
+           .fail(function (error) {
+               toastr.clear();
+               toastr.error("Error occoured: " + error.responseText);
+            });
+            return false;
+        }
+    </script>
+}
