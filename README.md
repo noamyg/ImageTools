@@ -7,7 +7,7 @@ Use a post request to `pdfToJpg` or `pdfToPng` with `content-type: application/p
 <u>Example:</u>
 
     $.ajax({
-        url: "http://server/api/convert/pdfToJpg"
+        url: "http://server/api/convert/pdfToJpg",
         method: "post",
         contentType: "application/pdf",
         data: "JVBERi0xLjUKJYCBgoMKMSAwIG9iago8PC9GaWx0ZXIvRmxhdGVEZWNvZGUvRmlyc3QgMTQxL04gMjAvTGVuZ3=="
