@@ -7,7 +7,7 @@
     <form id="convertPdf">
         <div class="form-group">
             <label for="base64Pdf">PDF Base64</label>
-            <textarea class="form-control" id="base64Pdf" rows="5"></textarea>
+            <textarea class="form-control" autocomplete="off" id="base64Pdf" rows="5"></textarea>
         </div>
         <h3>Convert a file to Base64</h3>
         <div class="form-group">
@@ -41,15 +41,15 @@
                 contentType: "application/pdf",
                 data: $('#base64Pdf').val()
             })
-                .done(function (data) {
-                    toastr.success("Image loaded");
-                    $('#imageResponse').parent('div').show();
-                    $('#imageResponse').attr('src', data);
-                })
-                .fail(function (error) {
-                    toastr.clear();
-                    toastr.error("Error occoured: " + error.responseText);
-                });
+            .done(function (data) {
+                toastr.success("Image loaded");
+                $('#imageResponse').parent('div').show();
+                $('#imageResponse').attr('src', data);
+            })
+            .fail(function (error) {
+                toastr.clear();
+                toastr.error("Error occoured: " + error.responseText);
+            });
             return false;
         }
 
