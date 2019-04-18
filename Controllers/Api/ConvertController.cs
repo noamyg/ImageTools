@@ -18,7 +18,7 @@ namespace ImageTools.Controllers.Api
         [HttpPost]
         [Route("api/convert/pdfToPng")]
         [Route("api/convert/pdfToJpg")]
-        public async Task<HttpResponseMessage> PdfToPng()
+        public async Task<HttpResponseMessage> PdfToImage()
         {
             HttpResponseMessage response;
             var base64FromRequest = await Request.Content.ReadAsStringAsync();
@@ -33,11 +33,11 @@ namespace ImageTools.Controllers.Api
                 var route = Request.RequestUri.Segments.Last();
                 if (route == "pdfToPng")
                 {
-                    response.Content = new StringContent(string.Format("data:image/{0};base64,{1}", "png", Base64PdfToImage(MagickFormat.Png, base64FromRequest)));
+                    response.Content = new StringContent(string.Format("data:image/{0};base64,{1}", "png", convertBase64PdfToBase64Image(MagickFormat.Png, base64FromRequest)));
                 }
                 else if (route == "pdfToJpg")
                 {
-                    response.Content = new StringContent(string.Format("data:image/{0};base64,{1}", "jpeg", Base64PdfToImage(MagickFormat.Jpg, base64FromRequest)));
+                    response.Content = new StringContent(string.Format("data:image/{0};base64,{1}", "jpeg", convertBase64PdfToBase64Image(MagickFormat.Jpg, base64FromRequest)));
                 }
 
             }
@@ -58,7 +58,7 @@ namespace ImageTools.Controllers.Api
         }
         
 
-        private string Base64PdfToImage(MagickFormat format, string base64FromRequest)
+        private string convertBase64PdfToBase64Image(MagickFormat format, string base64FromRequest)
         {
             byte[] byteArrImage;
             using (MagickImageCollection images = new MagickImageCollection())

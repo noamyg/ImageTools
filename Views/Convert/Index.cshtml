@@ -9,6 +9,12 @@
             <label for="base64Pdf">PDF Base64</label>
             <textarea class="form-control" id="base64Pdf" rows="5"></textarea>
         </div>
+        <h3>Convert a file to Base64</h3>
+        <div class="form-group">
+            <label for="pdfFile">File input</label>
+            <input type="file" class="form-control-file" id="pdfFile" accept="application/pdf" onchange="onFileSelected(this)">
+            <small id="fileHelp" class="form-text text-muted">After your file is selected, it will be automatically converted to Base64 string.</small>
+        </div>
         <button id="toJpgSubmitButton" onclick="return convertPdfToImage('pdfToJpg')" type="submit" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="" data-original-title="Non-transparent format - will translate background to white">Convert To JPG</button>
         <button id="toPngSubmitButton" onclick="return convertPdfToImage('pdfToPng')" type="submit" class="btn btn-secondary">Convert To PNG</button>
     </form>
@@ -26,7 +32,7 @@
             $('[data-toggle="tooltip"]').tooltip();
             
         });
-        
+
         function convertPdfToImage(service) {
             toastr.info('Submitting...');
             $.ajax({
@@ -35,16 +41,52 @@
                 contentType: "application/pdf",
                 data: $('#base64Pdf').val()
             })
-           .done(function (data) {
-               toastr.success("Image loaded");
-               $('#imageResponse').parent('div').show();
-               $('#imageResponse').attr('src', data);
-            })
-           .fail(function (error) {
-               toastr.clear();
-               toastr.error("Error occoured: " + error.responseText);
-            });
+                .done(function (data) {
+                    toastr.success("Image loaded");
+                    $('#imageResponse').parent('div').show();
+                    $('#imageResponse').attr('src', data);
+                })
+                .fail(function (error) {
+                    toastr.clear();
+                    toastr.error("Error occoured: " + error.responseText);
+                });
             return false;
         }
+
+
+        function onFileSelected(input) {
+            if (input.files && input.files.length == 1) {
+                var reader = new FileReader();
+                reader.readAsDataURL(input.files[0]);
+                reader.onload = function () {
+                    var splittedResult = reader.result.split(',');
+                    if (splittedResult[0] != 'data:application/pdf;base64') {
+                        toastr.error("Was that really a PDF?");
+                        setToManualInput(true);
+                        return;
+                    }
+                    else {
+                        $('#base64Pdf').val(splittedResult[1]);
+                        setToManualInput(false);
+                    }
+                };
+                reader.onerror = function (error) {
+                    toastr.error("Failed to parse the uploaded file as PDF." + error);
+                    setToManualInput(true);
+                };
+            }
+            else setToManualInput(true);
+        }
+
+        function setToManualInput(enabled) {
+            if (enabled) {
+                $('#pdfFile').val("");
+                $('#base64Pdf').val("").removeAttr("disabled");
+            }
+            else {
+                $('#base64Pdf').attr('disabled', 'true');
+            }
+        }
+
     </script>
 }
