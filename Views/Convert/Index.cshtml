@@ -2,7 +2,7 @@
     ViewBag.Title = "Convert Functions";
 }
 
-<div class="jumbotron">
+<div class="jumbotron container">
     <h1>Convert from PDF</h1>
     <form id="convertPdf">
         <div class="form-group">
@@ -12,7 +12,7 @@
         <h3>Convert a file to Base64</h3>
         <div class="form-group">
             <label for="pdfFile">File input</label>
-            <input type="file" class="form-control-file" id="pdfFile" accept="application/pdf" onchange="onFileSelected(this)">
+            <input type="file" class="form-control-file" id="pdfFile" accept="application/pdf" onchange="onFileSelected(this, ['pdf'])">
             <small id="fileHelp" class="form-text text-muted">After your file is selected, it will be automatically converted to Base64 string.</small>
         </div>
         <button id="toJpgSubmitButton" onclick="return convertPdfToImage('pdfToJpg')" type="submit" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="" data-original-title="Non-transparent format - will translate background to white">Convert To JPG</button>
@@ -20,17 +20,43 @@
     </form>
 </div>
 
+
+<div class="jumbotron container">
+    <h1>Convert Image Formats</h1>
+    <form id="convertImageFormats">
+        <div class="form-group">
+            <label for="base64Image">Image Base64</label>
+            <textarea class="form-control" autocomplete="off" id="base64Image" rows="5"></textarea>
+        </div>
+        <h3>Convert a file to a different format</h3>
+        <div class="form-group">
+            <label for="formatConvertFileSelection">File input</label>
+            <input type="file" class="form-control-file" id="imageToConvertFile" onchange="onFileSelected(this, ['gif', 'jpeg', 'jpg', 'png', 'webp', 'svg', 'ico'])">
+            <small id="fileHelp" class="form-text text-muted">After your file is selected, it will be automatically converted to Base64 string.</small>
+        </div>
+        <div class="row">
+            <div class="form-group col-6">
+                <input type="text" class="form-control" id="sourceContentType" placeholder='Set the "Content-Type" header'>
+            </div>
+            <div class="form-group col-6">
+                <input type="text" class="form-control" id="targetContentType" placeholder='Set the "Target-Content-Type" header'>
+            </div>
+        </div>
+        <button id="convertFormats" onclick="return convertImageToImage()" type="submit" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="" data-original-title="Non-transparent format - will translate background to white">Change Format</button>
+    </form>
+</div>
+
 <div style="display: none;" class="container bg-white">
-    <img id="imageResponse" class="img-fluid" alt="Responsive image"/>
+    <img id="imageResponse" class="img-fluid" alt="Responsive image" />
 </div>
 
 
 @section scripts
 {
     <script>
-        $(document).ready(function(){
+        $(document).ready(function () {
             $('[data-toggle="tooltip"]').tooltip();
-            
+
         });
 
         function convertPdfToImage(service) {
@@ -41,50 +67,79 @@
                 contentType: "application/pdf",
                 data: $('#base64Pdf').val()
             })
-            .done(function (data) {
-                toastr.success("Image loaded");
-                $('#imageResponse').parent('div').show();
-                $('#imageResponse').attr('src', data);
-            })
-            .fail(function (error) {
-                toastr.clear();
-                toastr.error("Error occoured: " + error.responseText);
-            });
+                .done(function (data) {
+                    toastr.success("Image loaded");
+                    $('#imageResponse').parent('div').show();
+                    $('#imageResponse').attr('src', data);
+                })
+                .fail(function (error) {
+                    toastr.clear();
+                    toastr.error("Error occurred: " + error.responseText);
+                });
             return false;
         }
 
 
-        function onFileSelected(input) {
+        function onFileSelected(input, allowedExtensions) {
             if (input.files && input.files.length == 1) {
+                var found = false;
+                var fileExt = input.files[0].name.split('.').pop();
+                var $relatedTextArea = $(input).parents('form').find('textarea:first');
+                for (var ext in allowedExtensions) {
+                    if (allowedExtensions[ext].toLocaleLowerCase() == fileExt.toLocaleLowerCase()) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    toastr.error("Was that really a " + allowedExtensions.join('/') + "?");
+                    setToManualInput(true, $(input), $relatedTextArea);
+                    return;
+                }
                 var reader = new FileReader();
                 reader.readAsDataURL(input.files[0]);
                 reader.onload = function () {
                     var splittedResult = reader.result.split(',');
-                    if (splittedResult[0] != 'data:application/pdf;base64') {
-                        toastr.error("Was that really a PDF?");
-                        setToManualInput(true);
-                        return;
-                    }
-                    else {
-                        $('#base64Pdf').val(splittedResult[1]);
-                        setToManualInput(false);
-                    }
+                    $relatedTextArea.val(splittedResult[1]);
+                    setToManualInput(false, $(input), $relatedTextArea);
                 };
                 reader.onerror = function (error) {
                     toastr.error("Failed to parse the uploaded file as PDF." + error);
-                    setToManualInput(true);
+                    setToManualInput(true, $(input), $relatedTextArea);
                 };
             }
-            else setToManualInput(true);
+            else setToManualInput(true, $(input), $relatedTextArea);
         }
 
-        function setToManualInput(enabled) {
+
+        function convertImageToImage() {
+            toastr.info('Submitting...');
+            $.ajax({
+                url: "/api/convert/imageToImage",
+                method: "post",
+                contentType: $('#sourceContentType').val(),
+                headers: { 'Target-Content-Type': $('#targetContentType').val() },
+                data: $('#base64Image').val()
+            })
+                .done(function (data) {
+                    toastr.success("Image loaded");
+                    $('#imageResponse').parent('div').show();
+                    $('#imageResponse').attr('src', data);
+                })
+                .fail(function (error) {
+                    toastr.clear();
+                    toastr.error("Error occurred: " + error.responseText);
+                });
+            return false;
+        }
+
+        function setToManualInput(enabled, $fileInput, $textArea) {
             if (enabled) {
-                $('#pdfFile').val("");
-                $('#base64Pdf').val("").removeAttr("disabled");
+                $fileInput.val("");
+                $textArea.val("").removeAttr("disabled");
             }
             else {
-                $('#base64Pdf').attr('disabled', 'true');
+                $textArea.attr('disabled', 'true');
             }
         }
 
