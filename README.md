@@ -29,6 +29,8 @@ Use a post request to `pdfToJpg` or `pdfToPng` with Content-Type: `application/p
 Use a post request to `imageToImage`. Set Content-Type as the request content type, and set the required extension by a custom header `Target-Content-Type`.
 [See the standard, supported, image mime types](https://mzl.la/2WNMSAg).
 
+Note: for security purposes, sending an equal Content-Type and Target-Content-Type will first convert the image to BMP, then re-convert it to the original type.
+
 <u>Example:</u>
 
     $.ajax({
