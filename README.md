@@ -27,7 +27,7 @@ Use a post request to `pdfToJpg` or `pdfToPng` with Content-Type: `application/p
 ##### One Image Format To Another
 
 Use a post request to `imageToImage`. Set Content-Type as the request content type, and set the required extension by a custom header `Target-Content-Type`.
-[See the standard, supported, image mime types.](https://mzl.la/2WNMSAg).
+[See the standard, supported, image mime types](https://mzl.la/2WNMSAg).
 
 <u>Example:</u>
 
