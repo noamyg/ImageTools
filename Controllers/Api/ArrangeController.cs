@@ -65,9 +65,9 @@ namespace ImageTools.Controllers.Api
                         case "mosaic":
                             return images.Mosaic();
                         case "combineHorizontally":
-                            return images.AppendVertically();
-                        default:
                             return images.AppendHorizontally();
+                        default:
+                            return images.AppendVertically();
                         }
                 };
                 using (IMagickImage result = arrangementMethod(route))
