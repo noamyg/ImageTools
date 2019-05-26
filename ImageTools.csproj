@@ -142,6 +142,8 @@
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="Controllers\Api\ArrangeController.cs" />
+    <Compile Include="Controllers\ArrangeController.cs" />
     <Compile Include="Controllers\ConvertController.cs" />
     <Compile Include="Models\MagickTools.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -191,6 +193,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Arrange\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
