@@ -81,17 +81,18 @@
 
 
         function onFileSelected(input, allowedExtensions) {
+            var $relatedTextArea = $(input).parents('form').find('textarea:first');
+            $relatedTextArea.val("");
             if (input.files && input.files.length == 1) {
-                var found = false;
+                var fileExtensionVerified = false;
                 var fileExt = input.files[0].name.split('.').pop();
-                var $relatedTextArea = $(input).parents('form').find('textarea:first');
                 for (var ext in allowedExtensions) {
                     if (allowedExtensions[ext].toLocaleLowerCase() == fileExt.toLocaleLowerCase()) {
-                        found = true;
+                        fileExtensionVerified = true;
                         break;
                     }
                 }
-                if (!found) {
+                if (!fileExtensionVerified) {
                     toastr.error("Was that really a " + allowedExtensions.join('/') + "?");
                     setToManualInput(true, $(input), $relatedTextArea);
                     return;

@@ -1,0 +1,110 @@
+﻿@{
+    ViewBag.Title = "Arrange Functions";
+}
+
+<div class="jumbotron container">
+    <h1>Rearrange Image</h1>
+    <form id="rearrangeImage">
+        <div class="form-group">
+            <label for="imageBase64">Image Base64</label>
+            <textarea class="form-control" autocomplete="off" id="imageBase64" rows="5"></textarea>
+        </div>
+        <h3>Convert a file to Base64</h3>
+        <div class="form-group">
+            <label for="imageFiles">File input</label>
+            <input type="file" class="form-control-file" id="imageFiles" multiple accept="image/jpeg" onchange="onFileSelected(this, ['jpeg', 'jpg'])">
+            <small id="fileHelp" class="form-text text-muted">After your file is selected, it will be automatically converted to a comma delimited Base64 string</small>
+        </div>
+        <button id="combineVertically" onclick="return rearrangeImages('combineVertically')" type="submit" class="btn btn-secondary">Combine Vertically</button>
+        <button id="combineHorizontally" onclick="return rearrangeImages('combineHorizontally')" type="submit" class="btn btn-secondary">Combine Horizontally</button>
+        <button id="combineHorizontally" onclick="return rearrangeImages('mosaic')" type="submit" class="btn btn-secondary">Create Mosaic</button>
+    </form>
+</div>
+
+<div style="display: none;" class="container bg-white">
+    <img id="imageResponse" class="img-fluid" alt="Responsive image" />
+</div>
+
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+
+        });
+
+        function rearrangeImages(service) {
+            toastr.info('Submitting...');
+            $.ajax({
+                url: "/api/arrange/" + service,
+                method: "post",
+                contentType: "image/jpeg",
+                data: $('#imageBase64').val()
+            })
+                .done(function (data) {
+                    toastr.success("Image loaded");
+                    $('#imageResponse').parent('div').show();
+                    $('#imageResponse').attr('src', data);
+                })
+                .fail(function (error) {
+                    toastr.clear();
+                    toastr.error("Error occurred: " + error.responseText);
+                });
+            return false;
+        }
+
+
+        function onFileSelected(input, allowedExtensions) {
+            var $relatedTextArea = $(input).parents('form').find('textarea:first');
+            $relatedTextArea.val("");
+            if (input.files && input.files.length > 0) {
+                for (var f in input.files) {
+                    (function (file) {
+                        if (!(file instanceof File)) return;
+                        fileExtensionVerified = false;
+                        var fileExt = file.name.split('.').pop();
+                        for (var ext in allowedExtensions) {
+                            if (allowedExtensions[ext].toLocaleLowerCase() == fileExt.toLocaleLowerCase()) {
+                                fileExtensionVerified = true;
+                                break;
+                            }
+                        }
+                        if (!fileExtensionVerified) {
+                            toastr.error("Was that really a " + allowedExtensions.join('/') + "?");
+                            setToManualInput(true, $(input), $relatedTextArea);
+                            return;
+                        }
+                        var reader = new FileReader();
+                        reader.readAsDataURL(file);
+                        reader.onload = function () {
+                            var splittedResult = reader.result.split(',');
+                            debugger;
+                            if (!($relatedTextArea.val())) {
+                                $relatedTextArea.val(splittedResult[1]);
+                            }
+                            else $relatedTextArea.val($relatedTextArea.val() + ',' + splittedResult[1]);
+                            setToManualInput(false, $(input), $relatedTextArea);
+                        };
+                        reader.onerror = function (error) {
+                            toastr.error("Failed to parse the uploaded file as an image." + error);
+                            setToManualInput(true, $(input), $relatedTextArea);
+                        };
+                    })(input.files[f]);
+                }
+            }
+            else setToManualInput(true, $(input), $relatedTextArea);
+        };
+        
+        function setToManualInput(enabled, $fileInput, $textArea) {
+            if (enabled) {
+                $fileInput.val("");
+                $textArea.val("").removeAttr("disabled");
+            }
+            else {
+                $textArea.attr('disabled', 'true');
+            }
+        }
+
+    </script>
+}
