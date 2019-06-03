@@ -1,7 +1,7 @@
 # ImageTools
 Rest API for image manipulations.
 
-### Convertion Tools
+### Convertion Tools (*route; /api/convert*)
 
 ##### PDF To Image
 
@@ -38,6 +38,51 @@ Note: for security purposes, sending an equal Content-Type and Target-Content-Ty
         method: "post",
         contentType: "image/jpeg",
         headers: { 'Target-Content-Type': "image/gif" },
+        data: "JVBERi0xLjUKJYCBgoMKMSAwIG9iago8PC9GaWx0ZXIvRmxhdGVEZWNvZGUvRmlyc3QgMTQxL04gMjAvTGVuZ3=="
+    })
+    .done(function (data) {
+        console.log("done");
+    })
+    .fail(function (error) {
+        console.log("Error occoured: " + error.responseText);
+    });
+
+### Image Arrangement Tools (*route; /api/arrange*)
+
+Use a post request to `combineHorizontally`, `combineVertically` or `mosaic` to combine pictures togeter.
+Pictures should be posted as Base64, seperated by comma.
+
+<u>Example:</u>
+
+    $.ajax({
+        url: "http://server/api/arrange/combineHorizontally",
+        method: "post",
+        contentType: "image/jpeg",
+        data: "JVBERi0xLjUKJYCBgoMKMSAwIG9iago8PC9GaWx0ZXIvRmxhdGVEZWNvZGUvRmlyc3QgMTQxL04gMjAvTGVuZ3==,==Base64String==,==AnotherBase64=="
+    })
+    .done(function (data) {
+        console.log("done");
+    })
+    .fail(function (error) {
+        console.log("Error occoured: " + error.responseText);
+    });
+
+
+
+
+### Image Resize (*route; /api/resize*)
+
+Use a post request to the root route.
+Body should be Base64 String.
+You shoud have at least one header: `Width` or `Height`. If you supply one, the other one will be determined and the scale will be preserved.
+
+<u>Example:</u>
+
+    $.ajax({
+        url: "http://server/api/resize/",
+        method: "post",
+        headers: { 'Width': "300" }
+        contentType: "image/jpeg",
         data: "JVBERi0xLjUKJYCBgoMKMSAwIG9iago8PC9GaWx0ZXIvRmxhdGVEZWNvZGUvRmlyc3QgMTQxL04gMjAvTGVuZ3=="
     })
     .done(function (data) {
