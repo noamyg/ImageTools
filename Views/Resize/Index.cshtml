@@ -1,0 +1,112 @@
+﻿@{
+    ViewBag.Title = "Resize Functions";
+}
+
+
+<div class="jumbotron container">
+    <h1>Resize Image</h1>
+    <form id="resizeImageForm">
+        <div class="form-group">
+            <label for="base64Image">Image Base64</label>
+            <textarea class="form-control" autocomplete="off" id="base64Image" rows="5"></textarea>
+        </div>
+        <h3>Convert a file to a different format</h3>
+        <div class="form-group">
+            <label for="formatResizeFileSelection">File input</label>
+            <input type="file" class="form-control-file" id="formatResizeFileSelection" onchange="onFileSelected(this, ['gif', 'jpeg', 'jpg', 'png', 'webp', 'svg', 'ico'])">
+            <small id="fileHelp" class="form-text text-muted">After your file is selected, it will be automatically converted to Base64 string.</small>
+        </div>
+        <div class="row">
+            <div class="form-group col-6">
+                <input type="text" class="form-control" id="height" placeholder='Set the "Height" header'>
+            </div>
+            <div class="form-group col-6">
+                <input type="text" class="form-control" id="width" placeholder='Set the "Width" header'>
+            </div>
+        </div>
+        <button id="resizeImageBtn" onclick="return resizeImage()" type="submit" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="">Resize Image</button>
+    </form>
+</div>
+
+<div style="display: none;" class="container bg-white">
+    <img id="imageResponse" class="img-fluid" alt="Responsive image" />
+</div>
+
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+
+        });
+
+
+        function onFileSelected(input, allowedExtensions) {
+            var $relatedTextArea = $(input).parents('form').find('textarea:first');
+            $relatedTextArea.val("");
+            if (input.files && input.files.length == 1) {
+                var fileExtensionVerified = false;
+                var fileExt = input.files[0].name.split('.').pop();
+                for (var ext in allowedExtensions) {
+                    if (allowedExtensions[ext].toLocaleLowerCase() == fileExt.toLocaleLowerCase()) {
+                        fileExtensionVerified = true;
+                        break;
+                    }
+                }
+                if (!fileExtensionVerified) {
+                    toastr.error("Was that really a " + allowedExtensions.join('/') + "?");
+                    setToManualInput(true, $(input), $relatedTextArea);
+                    return;
+                }
+                var reader = new FileReader();
+                reader.readAsDataURL(input.files[0]);
+                reader.onload = function () {
+                    var splittedResult = reader.result.split(',');
+                    $relatedTextArea.val(splittedResult[1]);
+                    setToManualInput(false, $(input), $relatedTextArea);
+                };
+                reader.onerror = function (error) {
+                    toastr.error("Failed to parse the uploaded file as PDF." + error);
+                    setToManualInput(true, $(input), $relatedTextArea);
+                };
+            }
+            else setToManualInput(true, $(input), $relatedTextArea);
+        }
+        
+        function resizeImage() {
+            toastr.info('Submitting...');
+            $.ajax({
+                url: "/api/resize",
+                method: "post",
+                headers: {
+                    'Width': $('#width').val(),
+                    'Height': $('#height').val()
+                },
+                data: $('#base64Image').val()
+            })
+                .done(function (data) {
+                    toastr.success("Image loaded");
+                    $('#imageResponse').parent('div').show();
+                    $('#imageResponse').attr('src', data);
+                })
+                .fail(function (error) {
+                    toastr.clear();
+                    toastr.error("Error occurred: " + error.responseText);
+                });
+            return false;
+        }
+
+
+        function setToManualInput(enabled, $fileInput, $textArea) {
+            if (enabled) {
+                $fileInput.val("");
+                $textArea.val("").removeAttr("disabled");
+            }
+            else {
+                $textArea.attr('disabled', 'true');
+            }
+        }
+
+    </script>
+}

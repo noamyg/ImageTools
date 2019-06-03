@@ -14,11 +14,11 @@ namespace ImageTools.Controllers.Api
         [Route("api/arrange/combineVertically")]
         [Route("api/arrange/combineHorizontally")]
         [Route("api/arrange/mosaic")]
-        public async Task<HttpResponseMessage> combineImages()
+        public async Task<HttpResponseMessage> CombineImages()
         {
             HttpResponseMessage response;
             var base64FromRequest = await Request.Content.ReadAsStringAsync();
-            if (base64FromRequest == null || base64FromRequest.Length == 0)
+            if (String.IsNullOrEmpty(base64FromRequest) || base64FromRequest.Length == 0)
             {
                 response = new HttpResponseMessage(HttpStatusCode.BadRequest);
                 response.Content = new StringContent("Base 64 input cannot be empty");
@@ -27,7 +27,7 @@ namespace ImageTools.Controllers.Api
                 {
                     response = new HttpResponseMessage(HttpStatusCode.OK);
                     var route = Request.RequestUri.Segments.Last();
-                    response.Content = new StringContent(string.Format("data:image/{0};base64,{1}", "jpeg", combineBase64ImagesToOne(route, base64FromRequest)));
+                    response.Content = new StringContent(string.Format("data:image/{0};base64,{1}", "jpeg", CombineBase64ImagesToOne(route, base64FromRequest)));
                 }
                 catch (Exception e)
                 {
@@ -47,7 +47,7 @@ namespace ImageTools.Controllers.Api
 
 
 
-        private string combineBase64ImagesToOne(string route, string base64FromRequest)
+        private string CombineBase64ImagesToOne(string route, string base64FromRequest)
         {
             byte[] byteArrImage;
             using (MagickImageCollection images = new MagickImageCollection())

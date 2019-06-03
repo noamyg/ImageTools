@@ -10,7 +10,7 @@ namespace ImageTools.Models
     {
         public static MagickReadSettings ReadSettings = new MagickReadSettings()
         {
-            Density = new Density(100, 100)
+            Density = new Density(125, 125)
         };
 
         public static readonly List<MagickFormat> TransparencySupportedFormats = new List<MagickFormat>()

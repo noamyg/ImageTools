@@ -6,6 +6,7 @@ using System.Web.Http;
 using ImageMagick;
 using System.Threading.Tasks;
 using ImageTools.Models;
+using System.Collections.Generic;
 
 namespace ImageTools.Controllers.Api
 {
@@ -19,7 +20,7 @@ namespace ImageTools.Controllers.Api
         {
             HttpResponseMessage response;
             var base64FromRequest = await Request.Content.ReadAsStringAsync();
-            if (base64FromRequest == null || base64FromRequest.Length == 0)
+            if (String.IsNullOrEmpty(base64FromRequest) || base64FromRequest.Length == 0)
             {
                 response = new HttpResponseMessage(HttpStatusCode.BadRequest);
                 response.Content = new StringContent("Base 64 input cannot be empty");
@@ -30,11 +31,11 @@ namespace ImageTools.Controllers.Api
                     var route = Request.RequestUri.Segments.Last();
                     if (route == "pdfToPng")
                     {
-                        response.Content = new StringContent(string.Format("data:image/{0};base64,{1}", "png", convertBase64PdfToBase64Image(MagickFormat.Png, base64FromRequest)));
+                        response.Content = new StringContent(string.Format("data:image/{0};base64,{1}", "png", ConvertBase64PdfToBase64Image(MagickFormat.Png, base64FromRequest)));
                     }
                     else if (route == "pdfToJpg")
                     {
-                        response.Content = new StringContent(string.Format("data:image/{0};base64,{1}", "jpeg", convertBase64PdfToBase64Image(MagickFormat.Jpg, base64FromRequest)));
+                        response.Content = new StringContent(string.Format("data:image/{0};base64,{1}", "jpeg", ConvertBase64PdfToBase64Image(MagickFormat.Jpg, base64FromRequest)));
                     }
 
                 }
@@ -60,7 +61,12 @@ namespace ImageTools.Controllers.Api
             HttpResponseMessage response;
             var headers = Request.Headers;
             var sourceContentType = Request.Content.Headers.ContentType?.MediaType;
-            var targetContentType = headers.GetValues("Target-Content-Type").First();
+            var targetContentType = String.Empty;
+            IEnumerable<string> targetContentTypeHeader;
+            if (headers.TryGetValues("Target-Content-Type", out targetContentTypeHeader))
+            {
+                targetContentType = targetContentTypeHeader.FirstOrDefault();
+            }
             var base64ImageFromRequest = await Request.Content.ReadAsStringAsync();
             if (base64ImageFromRequest == null || base64ImageFromRequest.Length == 0)
             {
@@ -105,7 +111,7 @@ namespace ImageTools.Controllers.Api
         }
 
 
-        private string convertBase64PdfToBase64Image(MagickFormat format, string base64FromRequest)
+        private string ConvertBase64PdfToBase64Image(MagickFormat format, string base64FromRequest)
         {
             byte[] byteArrImage;
             using (MagickImageCollection images = new MagickImageCollection())

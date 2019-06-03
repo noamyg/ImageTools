@@ -143,8 +143,10 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="Controllers\Api\ArrangeController.cs" />
+    <Compile Include="Controllers\Api\ResizeController.cs" />
     <Compile Include="Controllers\ArrangeController.cs" />
     <Compile Include="Controllers\ConvertController.cs" />
+    <Compile Include="Controllers\ResizeController.cs" />
     <Compile Include="Models\MagickTools.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
@@ -191,6 +193,7 @@
     <Content Include="Views\Convert\Index.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Arrange\Index.cshtml" />
+    <Content Include="Views\Resize\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
