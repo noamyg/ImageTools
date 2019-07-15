@@ -31,11 +31,11 @@ namespace ImageTools.Controllers.Api
                     var route = Request.RequestUri.Segments.Last();
                     if (route == "pdfToPng")
                     {
-                        response.Content = new StringContent(string.Format("data:image/{0};base64,{1}", "png", ConvertBase64PdfToBase64Image(MagickFormat.Png, base64FromRequest)));
+                        response.Content = new StringContent(string.Format("data:{0};base64,{1}", "png", ConvertBase64PdfToBase64Image(MagickFormat.Png, base64FromRequest)));
                     }
                     else if (route == "pdfToJpg")
                     {
-                        response.Content = new StringContent(string.Format("data:image/{0};base64,{1}", "jpeg", ConvertBase64PdfToBase64Image(MagickFormat.Jpg, base64FromRequest)));
+                        response.Content = new StringContent(string.Format("data:{0};base64,{1}", "jpeg", ConvertBase64PdfToBase64Image(MagickFormat.Jpg, base64FromRequest)));
                     }
 
                 }
@@ -91,7 +91,7 @@ namespace ImageTools.Controllers.Api
                 {
                     String convertedBase64Image = convertBase64ImageToBase64Image(MagickTools.ContentTypeToFormat[sourceContentType], MagickTools.ContentTypeToFormat[targetContentType], base64ImageFromRequest);
                     response = new HttpResponseMessage(HttpStatusCode.OK);
-                    response.Content = new StringContent(string.Format("data:image/{0};base64,{1}", MagickTools.ContentTypeToFormat.FirstOrDefault(x => x.Value == MagickTools.ContentTypeToFormat[targetContentType]).Key, convertedBase64Image));
+                    response.Content = new StringContent(string.Format("data:{0};base64,{1}", MagickTools.ContentTypeToFormat.FirstOrDefault(x => x.Value == MagickTools.ContentTypeToFormat[targetContentType]).Key, convertedBase64Image));
                 }
                 catch (Exception e)
                 {
