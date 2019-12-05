@@ -1,5 +1,6 @@
 # ImageTools
 Rest API for image manipulations. Try it out at http://imagetools.noamyg.com.
+<b>None of the following functions either saves the file, caches it or writes it to a log file.</b>
 
 ### Convertion Tools (*route; /api/convert*)
 
