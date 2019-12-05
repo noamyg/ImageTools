@@ -121,15 +121,15 @@ namespace ImageTools.Controllers.Api
                 images.Read(pdfBytes, MagickTools.ReadSettings);
                 //Reverse images for RTL languages
                 images.Reverse();
-                using (IMagickImage horizontal = images.AppendHorizontally())
+                using (IMagickImage vertical = images.AppendVertically())
                 {
                     //For non-transparent image types - recolor Transparent as White
                     if (!MagickTools.TransparencySupportedFormats.Contains(format))
                     {
-                        horizontal.Opaque(MagickColors.Transparent, MagickColors.White);
+                        vertical.Opaque(MagickColors.Transparent, MagickColors.White);
                     }
-                    horizontal.Format = format;
-                    byteArrImage = horizontal.ToByteArray();
+                    vertical.Format = format;
+                    byteArrImage = vertical.ToByteArray();
 
                 }
             }

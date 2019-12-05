@@ -1,5 +1,5 @@
 # ImageTools
-Rest API for image manipulations.
+Rest API for image manipulations. Try it out at http://imagetools.noamyg.com.
 
 ### Convertion Tools (*route; /api/convert*)
 

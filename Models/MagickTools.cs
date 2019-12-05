@@ -1,8 +1,6 @@
 ﻿using ImageMagick;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace ImageTools.Models
 {
@@ -30,6 +28,7 @@ namespace ImageTools.Models
             {"image/webp", MagickFormat.WebP},
             {"image/svg+xml", MagickFormat.Svg},
             {"image/x-icon", MagickFormat.Ico},
+            {"image/tiff", MagickFormat.Tiff}
         };
     }
 }
