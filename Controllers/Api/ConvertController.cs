@@ -119,8 +119,8 @@ namespace ImageTools.Controllers.Api
                 // Add all the pages of the pdf file to the collection
                 byte[] pdfBytes = Convert.FromBase64String(base64FromRequest);
                 images.Read(pdfBytes, MagickTools.ReadSettings);
-                //Reverse images for RTL languages
-                images.Reverse();
+                //Reverse images for RTL languages (When using AppendHorizontally)
+                //images.Reverse();
                 using (IMagickImage vertical = images.AppendVertically())
                 {
                     //For non-transparent image types - recolor Transparent as White
