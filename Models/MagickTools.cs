@@ -8,7 +8,10 @@ namespace ImageTools.Models
     {
         public static MagickReadSettings ReadSettings = new MagickReadSettings()
         {
-            Density = new Density(150, 150)
+            Density = new Density(
+                Double.Parse(System.Configuration.ConfigurationManager.AppSettings["ImageDensityX"].ToString()),
+                Double.Parse(System.Configuration.ConfigurationManager.AppSettings["ImageDensityY"].ToString())
+            )
         };
 
         public static readonly List<MagickFormat> TransparencySupportedFormats = new List<MagickFormat>()
